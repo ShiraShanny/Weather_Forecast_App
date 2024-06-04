@@ -37,16 +37,12 @@ print(data['main'])
 print(data['weather'])
 
 coord = (data['coord'])
-print(coord)
 latitude = coord['lat']
 longitude = coord['lon']
 
 tf = TimezoneFinder()
 city_timezone = tf.timezone_at(lng=longitude, lat=latitude)
 city_tz = pytz.timezone(city_timezone)
-utc_now = dt.datetime.utcnow()
+utc_now = dt.datetime.now(pytz.utc)
 city_time = utc_now.astimezone(city_tz)
-print(city_tz)
-print(utc_now)
-print(city_time)
 print("Current time:", city_time.strftime('%Y-%m-%d %H:%M:%S %Z%z'))
