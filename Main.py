@@ -1,3 +1,45 @@
+import json
+import datetime as dt
+import pytz
+from timezonefinder import TimezoneFinder
+import requests
+import base64
+
+def get_weather_data(encoded_key, city_name, state_code = '', country_code = '',units = 'F'):
+  if units == 'C':
+    url = f"""https://api.openweathermap.org/data/2.5/weather?q={city_name},{state_code},{country_code}&appid={base64.b64decode(encoded_key).decode('utf-8')}&units=metric"""
+  else:
+    url = f"""https://api.openweathermap.org/data/2.5/weather?q={city_name},{state_code},{country_code}&appid={base64.b64decode(encoded_key).decode('utf-8')}&units=imperial"""
+  response = requests.get(url)
+  return response
+
+def encode_api_key(API_key):
+    encoded_key = base64.b64encode(API_key.encode()).decode('utf-8')
+    return encoded_key
+
+API_key = 'b03f17721ddcc0700bb0dcc4b47d5dbf'
+encoded_key = encode_api_key(API_key)
+
+def city_timezone(latitude, longitude):
+  tf = TimezoneFinder()
+  city_timezone = tf.timezone_at(lng=longitude, lat=latitude)
+  city_tz = pytz.timezone(city_timezone)
+  utc_now = dt.datetime.now(pytz.utc)
+  city_time = utc_now.astimezone(city_tz)
+  return city_time
+
+def load_settings(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            settings = json.load(file)
+    except FileNotFoundError:
+        settings = {}
+    return settings
+
+def save_settings(file_path, settings):
+    with open(file_path, 'w') as file:
+        json.dump(settings, file, indent=4)
+
 def main():
 
     while True:
