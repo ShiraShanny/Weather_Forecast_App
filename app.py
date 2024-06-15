@@ -2,59 +2,36 @@ import streamlit as st
 import datetime as dt
 import pytz
 from timezonefinder import TimezoneFinder
-from collections import Counter
 import requests
-import json
+import base64
+from Main import encode_api_key
 
-
-# Load city list
-def load_city_list(file_path):
-    with open(file_path, encoding="utf8") as file:
-        city_list = json.load(file)
-    return city_list
-
-
-# Find duplicate city names
-def find_duplicate_cities(city_list):
-    city_names = [entry['name'].lower() for entry in city_list]
-    city_count = Counter(city_names)
-    duplicate_cities = [name for name, count in city_count.items() if count > 1]
-    return duplicate_cities
-
-
-# Get weather data from OpenWeatherMap API
-def get_weather_data(city_name, state_code, country_code, duplicate_cities, API_key):
-    if city_name.lower() in duplicate_cities:
-        if state_code.lower() != 'na':
-            url = f"https://api.openweathermap.org/data/2.5/weather?q={city_name},{state_code},{country_code}&appid={API_key}&units=metric"
-        else:
-            url = f"https://api.openweathermap.org/data/2.5/weather?q={city_name},{country_code}&appid={API_key}&units=metric"
-    else:
-        url = f"https://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={API_key}&units=metric"
-
-    response = requests.get(url)
-    return response.json()
-
+def get_weather_data(encoded_key, city_name, state_code = '', country_code = '',units = 'F'):
+  if units == 'C':
+    url = f"""https://api.openweathermap.org/data/2.5/weather?q={city_name},{state_code},{country_code}&appid={base64.b64decode(encoded_key).decode('utf-8')}&units=metric"""
+  else:
+    url = f"""https://api.openweathermap.org/data/2.5/weather?q={city_name},{state_code},{country_code}&appid={base64.b64decode(encoded_key).decode('utf-8')}&units=imperial"""
+  response = requests.get(url)
+  return response.json()
 
 # Main function for the Streamlit app
 def weather_checker_app():
     st.title('Weather Checker App')
     st.subheader('This app presents the weather and time in your desired location')
 
-    API_key = 'ec45812d74648049b38512b286f1ae6d'
+    API_key = 'b03f17721ddcc0700bb0dcc4b47d5dbf'
+    encoded_key = encode_api_key(API_key)
     city_name = st.text_input('Enter city name:', 'New York')
-    state_code = st.text_input('Enter State code:')
-    country_code = st.text_input('Enter Country code:')
-
-    city_list = load_city_list('city.list.json')
-    duplicate_cities = find_duplicate_cities(city_list)
+    state_code = st.text_input('Enter State code (optional):')
+    country_code = st.text_input('Enter Country code (optional):').upper()
+    units = st.text_input('Enter temperature units (C/F): ', 'F').upper()
 
     if st.button('Get Weather'):
         try:
-            weather_data = get_weather_data(city_name, state_code, country_code, duplicate_cities, API_key)
+            weather_data = get_weather_data(encoded_key, city_name, state_code, country_code, units)
             if weather_data["cod"] == 200:
-                st.write(f"Weather in {city_name}: {weather_data['weather'][0]['description']}")
-                st.write(f"Temperature: {weather_data['main']['temp']}°C")
+                st.write(f"Weather in {city_name}, {country_code}: {weather_data['weather'][0]['description']}")
+                st.write(f"Temperature: {weather_data['main']['temp']}°{units}")
                 st.write(f"Humidity: {weather_data['main']['humidity']}%")
                 st.write(f"Wind Speed: {weather_data['wind']['speed']} m/s")
 
