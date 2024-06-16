@@ -1,5 +1,7 @@
 # Weather_Forecast_App
 The Weather Checker App is a simple web application built with Streamlit that allows users to check the current weather and local time for any city around the world. The app uses the OpenWeatherMap API to fetch weather data and the TimezoneFinder library to determine the local time.
+
+Demo available at [Weather Checker App](https://shirashanny-weather-forecast-app-app-rjr2xe.streamlit.app/)
 ## Features
  Fetches current weather information for a specified city.
 - Displays temperature, humidity, wind speed, and weather description.
@@ -49,13 +51,14 @@ To run the Weather Checker App, use the following command:
 streamlit run app.py
 ```
 Follow the prompts in the Streamlit interface to enter the city name and check the weather.
-## contributing
-fdgsklj
+
+you can also find the script in the CoLab notebook [here](https://github.com/ShiraShanny/Weather_Forecast_App/blob/cc165009c357b4cc8fd3a00b0d517db6f0459d0e/Shira_Shanny_BIU_DS217_Python_Project_1_Weather_Forecast.ipynb)
 ## License
 This project is licensed under the MIT License.
 
 ## Acnowledgements
  - streamlit
+ - Google Colab
  - OpenWeatherMap API
  - TimezoneFinder
 
